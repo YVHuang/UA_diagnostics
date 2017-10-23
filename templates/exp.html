@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+    
+    <head>
+        <title>Language Study</title>
+        <script src="../static/lib/jquery-min.js" type="text/javascript"></script>
+        <script src="../static/lib/underscore-min.js" type="text/javascript"></script>
+        <script src="../static/lib/backbone-min.js" type="text/javascript"></script>
+        
+        <script src="../static/js/jsPsych/jspsych.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-text.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-single-stim.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-categorize.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-conditional-run.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-survey-text.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-survey-multi-select.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-survey-multi-choice.js" type="text/javascript"></script>
+        <script src="../static/js/jsPsych/plugins/jspsych-call-function.js" type="text/javascript"></script>
+        
+        <script type="text/javascript">
+            // These fields provided by the psiTurk Server
+            var uniqueId = "{{ uniqueId }}"; // a unique string identifying the worker/task
+            var adServerLoc = "{{ adServerLoc }}"; // the location of your ad (so you can send user back at end of experiment)
+            var mode = "{{ mode }}"; // is this running live, sandbox, or in debug mode?
+        </script>
+
+        <!-- utils.js and psiturk.js provide the basic psiturk functionality -->
+        <script src="../static/js/utils.js" type="text/javascript"></script>
+        <script src="../static/js/psiturk.js" type="text/javascript"></script>
+
+        <!-- stim seeder -->
+        <script src="../static/js/stims.js" type="text/javascript"></script>
+        <script src="../static/js/story.js" type="text/javascript"></script>
+        <script src="../static/js/params.js" type="text/javascript"></script>
+        
+        <link href="../static/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+    </head>
+    
+    <body>
+        <div id='jspsych-target'></div>
+    </body>
+    <script>
+
+        var get_practice = function () {
+            var arr = []
+            for (var stim in stimuli.practice) {
+	        arr.push({questions:stimuli.practice[stim].questions, options:stimuli.practice[stim].options, correct:stimuli.practice[stim].correct, superq:stimuli.practice[stim].superq})
+            }
+            return jsPsych.randomization.shuffle(arr)
+        }
+
+        var get_stimuli = function () {
+            var arr = []
+            for (var stim in stimuli.stims) {
+                arr.push({questions:stimuli.stims[stim].questions, options:stimuli.stims[stim].options, correct:stimuli.stims[stim].correct, superq:stimuli.stims[stim].superq})
+            }
+        
+            return jsPsych.randomization.shuffle(arr)
+        } 
+
+
+      function notSure () {
+      var trial_index = jsPsych.progress()['current_trial_global'];
+      var trialResult = jsPsych.data.getData().values()[trial_index-1];
+      console.log(trialResult)
+      var questionAnswers = trialResult['responses']
+        return questionAnswers.indexOf('I\'m not sure') !== -1;   
+    }; 
+
+    var conditionals = {
+    type: 'conditional-run',
+    conditionalFunction: notSure,
+    dependentPluginParameters: {
+      type: 'survey-multi-choice',
+      preamble: story.shortstory,
+      superq:jsPsych.timelineVariable('superq'),
+      questions: ['If you are unsure, explain why.'],
+      options: [['In this context, the verb has more than one meaning.', 'Can\'t tell because the sentence doesn\'t sound right to me.', 'I don\'t know that verb.']],
+      required: [true],
+      horizontal: params.horizontal,
+      force_correct:params.force_correct,
+      correct: [["NA"]]
+        
+    }
+  };
+  
+        /* load psiturk */
+        var psiturk = new PsiTurk(uniqueId, adServerLoc, mode);
+
+        /* experiment */
+        var introduction = {
+            type: 'text',
+            text: '<p>In this task, you will answer some questions about English sentences. Scientists will use your answers in order to better understand how language works. In order to help you better understand what to do, we have written a background story for the task. This should make the task more clear.</p><p>Press any key to continue.</p>'
+        };
+
+        /* experiment */
+        var paradigm = {
+            type: 'text',
+            text: story.longstory
+        };
+
+	var instructions_practice = {
+	    type: 'text',
+	text: '<p>You will now do a few practice questions. You will get feedback if your answer is incorrect.</p><p>Press any key to continue.</p>'
+	};
+
+       var atrial = {
+            type: params.responsetype,
+	    required: [params.required, params.required, params.required, params.required, params.required, params. required, params.required, params.required, params.required],
+	    preamble: story.shortstory,
+	    questions: jsPsych.timelineVariable('questions'),
+	    options: jsPsych.timelineVariable('options'),
+	    correct: jsPsych.timelineVariable('correct'),
+	    horizontal: params.horizontal,
+	    superq: jsPsych.timelineVariable('superq'),
+	    force_correct: params.force_correct,
+        on_finish: function(data) {  
+            console.log(JSON.stringify(data));
+             console.log('The trial just ended.');
+              var trial_index = jsPsych.progress()['current_trial_global'];
+      var trialResult = jsPsych.data.getData().values()[trial_index];
+      console.log (trialResult)
+    super_q = trialResult['superq']
+      console.log (super_q)
+   
+           
+  }
+        }; 
+
+	var practice = {
+	    timeline: [atrial],
+	    timeline_variables: get_practice()
+	};
+
+        var ready = {
+            type: 'text',
+            text: `<p>You will now answer questions for real (${get_stimuli().length} total). Press any key to continue.</p>`
+        };
+
+	var trials = {
+	    timeline: [atrial, conditionals],
+	    timeline_variables: get_stimuli()
+	}; 
+
+        var demographics_prompt = {
+            type: 'text',
+            text: '<p>Are you interested in how people\'s backgrounds affects how they use language? We are too! Please answer the following questions. Press any key to continue.</p>'
+        };
+
+        var demographics = {
+          type: 'survey-text',
+          questions: ['How old are you?', 'What is your native language?', 'Please leave any comments or feedback here.'],
+          rows: [1,1,5],
+          columns: [10,25,50]
+        };
+
+        var complete = {
+            type: 'text',
+            text: '<p>You\'ve successfully answered all the questions. Press any key to complete the experiment. Thank you!</p>'
+        };
+
+        /* timeline */
+        var timeline = [];
+        timeline.push(introduction);
+        timeline.push(paradigm);
+        timeline.push(instructions_practice);
+        timeline.push(practice);
+        timeline.push(ready);
+        timeline.push(trials);
+        timeline.push(demographics_prompt);
+        timeline.push(demographics);
+        timeline.push(complete);
+
+        /* start the experiment */
+        jsPsych.init({
+            display_element: document.getElementById('jspsych-target'),
+            timeline: timeline,
+            on_finish: function() {
+                psiturk.saveData({
+                    success: function() { psiturk.completeHIT(); }
+                });
+            },
+            on_data_update: function(data) {
+                psiturk.recordTrialData(data);
+            }
+        })
+
+    </script>
+
+</html>

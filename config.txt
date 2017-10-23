@@ -1,0 +1,35 @@
+[HIT Configuration]
+title = Existence
+description = Read some sentences. Answer some questions about them. (Part of a linguistics study.)
+amt_keywords = Perception, Psychology, Language
+lifetime = 24
+us_only = true
+approve_requirement = 90
+contact_email_on_error = info@l3atbc.org
+ad_group = VerbCorner_Pilots
+psiturk_keywords = language acquisition
+organization_name = Boston College
+browser_exclude_rule = MSIE, mobile, tablet, bot
+
+[Database Parameters]
+database_url = mysql://l3atbc:Amwtb2016!@amt-pilots-cluster.cluster-cjto8h4s9y7b.us-east-1.rds.amazonaws.com/amt_pilots
+table_name = Existence
+
+[Server Parameters]
+host = 0.0.0.0
+port = 22362
+cutoff_time = 60
+logfile = psiturk.log
+loglevel = 2
+debug = false
+login_username = examplename
+login_pw = examplepassword
+threads = auto
+
+[Task Parameters]
+experiment_code_version = A_1.0
+num_conds = 1
+num_counters = 1
+
+[Shell Parameters]
+launch_in_sandbox_mode = true
