@@ -1,3 +1,4 @@
-sentence,question,correct,NP1,NP1options,NP1correct,NP2,NP2options,NP2correct,NP2correct,NP3,NP3options,NP3correct,NP4,NP4options,NP4correct,NP5,NP5options,NP5correct,NP6,NP6options,NP6correct,NP7,NP7options,NP7correct,NP8,NP8options,NP8correct,NP9,NP9options,NP9correct
-John sent the thing to Jill.,Does anything or anyone exist? ,"""always existed""",John,"""existed until the event"", ""existed starting with the event"", ""always existed"", ""I\'m not sure""","""always existed""",Thing,"""existed until the event"", ""existed starting with the event"", ""always existed"", ""I\'m not sure""","""always existed""","""always existed""",Jill,"""existed until the event"", ""existed starting with the event"", ""always existed"", ""I\'m not sure""","""always existed""",,,,,,,,,,,,,,,,,,
-Jeff touched the object.,Does anything or anyone exist? ,"""always existed""",Jeff,"""existed until the event"", ""existed starting with the event"", ""always existed"", ""I\'m not sure""","""always existed""",Object,"""existed until the event"", ""existed starting with the event"", ""always existed"", ""I\'m not sure""","""always existed""","""always existed""",,,,,,,,,,,,,,,,,,,,,
+sentence,question,correct,NP1,NP2,NP3,NP4,NP5,NP6,NP7,NP8,NP9
+The guests came.,How acceptable is the sentence?,"""7""",1,2,3,4,5,6,7,,
+The student worked diligently.,How acceptable is the sentence?,"""7""",1,2,3,4,5,6,7,,
+Nicole the.,How acceptable is the sentence?,"""1""",1,2,3,4,5,6,7,,
